@@ -13,12 +13,17 @@ export async function POST(request: Request) {
     // Ensure numeric fields are correctly typed, especially from JSON
     const data: DashboardData = {
         ...raw_data,
-        backups: (raw_data.backups || []).map((b: any) => ({
-            ...b,
-            input_bytes: b.input_bytes ? Number(b.input_bytes) : 0,
-            output_bytes: b.output_bytes ? Number(b.output_bytes) : 0,
-            elapsed_seconds: b.elapsed_seconds ? Number(b.elapsed_seconds) : 0,
-        }))
+        backups: (raw_data.backups || []).map((b: any) => {
+            const input_bytes = Number(b.input_bytes);
+            const output_bytes = Number(b.output_bytes);
+            const elapsed_seconds = Number(b.elapsed_seconds);
+            return {
+                ...b,
+                input_bytes: isNaN(input_bytes) ? 0 : input_bytes,
+                output_bytes: isNaN(output_bytes) ? 0 : output_bytes,
+                elapsed_seconds: isNaN(elapsed_seconds) ? 0 : elapsed_seconds,
+            };
+        })
     };
     
     const server_id = data.id;
